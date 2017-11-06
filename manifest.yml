@@ -1,0 +1,12 @@
+image: oznu/s6-alpine:latest
+manifests:
+  -
+    image: oznu/s6-alpine:latest
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: oznu/s6-alpine:armhf
+    platform:
+      architecture: arm
+      os: linux
