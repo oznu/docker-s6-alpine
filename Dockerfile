@@ -1,12 +1,12 @@
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE:-library/alpine}:edge
+FROM ${BASE_IMAGE:-library/alpine}:3.7
 
 ARG QEMU_ARCH
 ENV QEMU_ARCH=${QEMU_ARCH:-x86_64} S6_KEEP_ENV=1
 
 COPY qemu/qemu-${QEMU_ARCH}-static /usr/bin/
 
-RUN set -x && apk add --no-cache libgcc libstdc++ curl curl-dev coreutils tzdata shadow libstdc++ paxctl \
+RUN set -x && apk add --no-cache curl coreutils tzdata shadow \
   && case "${QEMU_ARCH}" in \
     x86_64) S6_ARCH='amd64';; \
     arm) S6_ARCH='armhf';; \
@@ -18,6 +18,7 @@ RUN set -x && apk add --no-cache libgcc libstdc++ curl curl-dev coreutils tzdata
   useradd -u 911 -U -d /config -s /bin/false abc && \
   usermod -G users abc && \
   mkdir -p /app /config /defaults && \
+  apk del --no-cache curl \
   apk del --purge \
   rm -rf /tmp/*
 
