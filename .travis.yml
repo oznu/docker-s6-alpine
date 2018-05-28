@@ -7,6 +7,8 @@ env:
   - BASE_IMAGE=library/alpine QEMU_ARCH=x86_64 DOCKERFILE="Dockerfile" TAG_SUFFIX="amd64"
   - BASE_IMAGE=arm32v6/alpine QEMU_ARCH=arm DOCKERFILE="Dockerfile" TAG_SUFFIX="armhf"
   - BASE_IMAGE=arm64v8/alpine QEMU_ARCH=aarch64 DOCKERFILE="Dockerfile" TAG_SUFFIX="aarch64"
+  - BASE_IMAGE=library/debian QEMU_ARCH=x86_64 DOCKERFILE="Dockerfile.debian" TAG_SUFFIX="debian-amd64"
+  - BASE_IMAGE=arm32v7/debian QEMU_ARCH=arm DOCKERFILE="Dockerfile.debian" TAG_SUFFIX="debian-armhf"
 
 before_script:
   - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
