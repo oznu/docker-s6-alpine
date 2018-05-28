@@ -1,24 +1,23 @@
-FROM alpine:3.7
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE:-library/alpine}:3.7
 
-ENV ARCH=amd64 S6_KEEP_ENV=1
+ARG QEMU_ARCH
+ENV QEMU_ARCH=${QEMU_ARCH:-x86_64} S6_KEEP_ENV=1
 
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories
+COPY qemu/qemu-${QEMU_ARCH}-static /usr/bin/
 
-# s6 overlay
-RUN apk add --no-cache curl coreutils tzdata shadow \
-  && curl -L -s https://github.com/just-containers/s6-overlay/releases/download/v1.21.1.1/s6-overlay-${ARCH}.tar.gz | tar xvzf - -C / \
-  && apk del --no-cache curl
-
-COPY rootfs /
-
-# create user
-RUN groupmod -g 911 users && \
+RUN set -x && apk add --no-cache libgcc libstdc++ curl curl-dev coreutils tzdata shadow libstdc++ paxctl \
+  && case "${QEMU_ARCH}" in \
+    x86_64) S6_ARCH='amd64';; \
+    arm) S6_ARCH='armhf';; \
+    aarch64) S6_ARCH='aarch64';; \
+    *) echo "unsupported architecture"; exit 1 ;; \
+  esac \
+  && curl -L -s https://github.com/just-containers/s6-overlay/releases/download/v1.21.1.1/s6-overlay-${S6_ARCH}.tar.gz | tar xvzf - -C / \
+  && groupmod -g 911 users && \
   useradd -u 911 -U -d /config -s /bin/false abc && \
   usermod -G users abc && \
-  mkdir -p \
-    /app \
-    /config \
-    /defaults && \
+  mkdir -p /app /config /defaults && \
   apk del --purge \
   rm -rf /tmp/*
 
